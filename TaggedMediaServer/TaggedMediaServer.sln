@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaggedMediaServerWeb", "TaggedMediaServerWeb\TaggedMediaServerWeb.csproj", "{EA94B02A-2621-4BAF-809C-B713B06C4B7A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{C72D7FDF-E9B6-491E-994D-29F92BB096B8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{EA94B02A-2621-4BAF-809C-B713B06C4B7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA94B02A-2621-4BAF-809C-B713B06C4B7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EA94B02A-2621-4BAF-809C-B713B06C4B7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C72D7FDF-E9B6-491E-994D-29F92BB096B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C72D7FDF-E9B6-491E-994D-29F92BB096B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C72D7FDF-E9B6-491E-994D-29F92BB096B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C72D7FDF-E9B6-491E-994D-29F92BB096B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

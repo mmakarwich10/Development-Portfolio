@@ -15,6 +15,16 @@ namespace TaggedMediaServerWeb.Controllers
             [FromQuery(Name = "type")] int typeId,
             [FromQuery] bool archived)
         {
+            string?[] tagList = HttpContext.Request.Query["tag"].ToArray();
+
+            foreach(string? tag in tagList)
+            {
+                if (tag == null)
+                {
+                    return BadRequest("One or more tags in the query are null.");
+                }
+            }
+
             List<MediumDto>
         }
     }

@@ -4,9 +4,11 @@ namespace Logic
 {
     public class MediaLogic : IMediaLogic
     {
-        public Task<List<MediumDto>> GetMediaWithFilters(bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
+        public Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
-            throw new NotImplementedException();
+            bool validOrigin = false;
+            bool validType = false;
+            bool validTags = false;
         }
     }
 }

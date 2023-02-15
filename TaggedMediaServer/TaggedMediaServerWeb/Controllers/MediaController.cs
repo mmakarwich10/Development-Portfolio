@@ -12,7 +12,7 @@ namespace TaggedMediaServerWeb.Controllers
         private IMediaLogic _mediaLogic;
 
         [HttpGet]
-        public async IActionResult GetMedia(
+        public async Task<IActionResult> GetMedia(
             [FromQuery(Name = "include-deprecated")] bool includeDeprecated = false, 
             [FromQuery(Name = "include-non-depr-dissociated")] bool includeNonDeprDissociated = false,
             [FromQuery(Name = "origin")] int originId = -1,
@@ -20,6 +20,7 @@ namespace TaggedMediaServerWeb.Controllers
             [FromQuery] bool archived = false)
         {
             string?[] tagList = HttpContext.Request.Query["tag"].ToArray();
+            List<string> cleanTagList = new List<string>();
 
             foreach(string? tag in tagList)
             {
@@ -27,19 +28,31 @@ namespace TaggedMediaServerWeb.Controllers
                 {
                     return BadRequest("One or more tags in the query are null.");
                 }
+                else
+                {
+                    cleanTagList.Add(tag);
+                }
             }
 
             if (originId < -1)
             {
-                return BadRequest("Origin ID cannot be less than zero.");
+                return BadRequest("Origin ID cannot be less than -1.");
             }
 
             if (typeId < -1)
             {
-                return BadRequest("Type ID cannot be less than zero.");
+                return BadRequest("Type ID cannot be less than -1.");
             }
 
-            List<MediumDto> returnedMedia = await _mediaLogic.GetMediaWithFilters(includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
+            try
+            {
+                List<MediumDto> returnedMedia = await _mediaLogic.GetMediaWithFilters(cleanTagList, includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
     }
 }

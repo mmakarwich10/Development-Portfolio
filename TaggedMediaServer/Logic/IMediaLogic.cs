@@ -9,6 +9,6 @@ namespace Logic
 {
     public interface IMediaLogic
     {
-        public Task<List<MediumDto>> GetMediaWithFilters(bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived);
+        public Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived);
     }
 }

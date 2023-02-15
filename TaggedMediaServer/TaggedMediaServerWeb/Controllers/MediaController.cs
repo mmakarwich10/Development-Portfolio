@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Logic;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models;
 
 namespace TaggedMediaServerWeb.Controllers
 {
@@ -7,8 +9,10 @@ namespace TaggedMediaServerWeb.Controllers
     [ApiController]
     public class MediaController : ControllerBase
     {
+        private IMediaLogic _mediaLogic;
+
         [HttpGet]
-        public IActionResult GetMedia(
+        public async IActionResult GetMedia(
             [FromQuery(Name = "include-deprecated")] bool includeDeprecated = false, 
             [FromQuery(Name = "include-non-depr-dissociated")] bool includeNonDeprDissociated = false,
             [FromQuery(Name = "origin")] int originId = -1,
@@ -35,7 +39,7 @@ namespace TaggedMediaServerWeb.Controllers
                 return BadRequest("Type ID cannot be less than zero.");
             }
 
-            List<MediumDto>
+            List<MediumDto> returnedMedia = await _mediaLogic
         }
     }
 }

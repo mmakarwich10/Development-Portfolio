@@ -9,11 +9,11 @@ namespace TaggedMediaServerWeb.Controllers
     {
         [HttpGet]
         public IActionResult GetMedia(
-            [FromQuery(Name = "include-deprecated")] bool includeDeprecated, 
-            [FromQuery(Name = "include-non-depr-dissociated")] bool includeNonDeprDissociated,
-            [FromQuery(Name = "origin")] int originId,
-            [FromQuery(Name = "type")] int typeId,
-            [FromQuery] bool archived)
+            [FromQuery(Name = "include-deprecated")] bool includeDeprecated = false, 
+            [FromQuery(Name = "include-non-depr-dissociated")] bool includeNonDeprDissociated = false,
+            [FromQuery(Name = "origin")] int originId = 0,
+            [FromQuery(Name = "type")] int typeId = 0,
+            [FromQuery] bool archived = false)
         {
             string?[] tagList = HttpContext.Request.Query["tag"].ToArray();
 
@@ -23,6 +23,16 @@ namespace TaggedMediaServerWeb.Controllers
                 {
                     return BadRequest("One or more tags in the query are null.");
                 }
+            }
+
+            if (originId < 0)
+            {
+                return BadRequest("Origin ID cannot be less than zero.");
+            }
+
+            if (typeId < 0)
+            {
+                return BadRequest("Type ID cannot be less than zero.");
             }
 
             List<MediumDto>

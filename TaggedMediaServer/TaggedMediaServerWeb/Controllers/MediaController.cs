@@ -39,7 +39,7 @@ namespace TaggedMediaServerWeb.Controllers
                 return BadRequest("Type ID cannot be less than zero.");
             }
 
-            List<MediumDto> returnedMedia = await _mediaLogic
+            List<MediumDto> returnedMedia = await _mediaLogic.GetMediaWithFilters(includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
         }
     }
 }

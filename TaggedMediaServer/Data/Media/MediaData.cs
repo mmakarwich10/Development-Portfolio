@@ -1,6 +1,6 @@
 ﻿using Models;
 
-namespace Data
+namespace Data.Media
 {
     public class MediaData : IMediaData
     {

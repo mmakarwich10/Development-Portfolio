@@ -1,4 +1,5 @@
-using Data;
+using Data.Media;
+using Data.Tags;
 using Logic;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IMediaData, MediaData>();
+builder.Services.AddScoped<ITagsData, TagsData>();
 
 builder.Services.AddScoped<IMediaLogic, MediaLogic>();
 

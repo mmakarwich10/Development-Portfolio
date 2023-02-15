@@ -1,4 +1,5 @@
-﻿using Data;
+﻿using Data.Media;
+using Data.Tags;
 using Models;
 
 namespace Logic
@@ -6,14 +7,21 @@ namespace Logic
     public class MediaLogic : IMediaLogic
     {
         private IMediaData _mediaData;
+        private ITagsData _tagsData;
 
         public async Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
-            bool validTags = false;
+            bool validTags = true;
             bool validOrigin = false;
             bool validType = false;
 
-            validTags = _mediaData;
+            foreach (var tagName in tagList)
+            {
+                if (!(await _tagsData.IsValidTag(tagName)))
+                {
+                    validTags = false;
+                }
+            }
 
             if (validTags)
             {

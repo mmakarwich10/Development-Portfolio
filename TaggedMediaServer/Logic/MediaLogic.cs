@@ -7,7 +7,7 @@ namespace Logic
     {
         private IMediaData _mediaData;
 
-        public Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
+        public async Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
             bool validTags = false;
             bool validOrigin = false;
@@ -15,9 +15,28 @@ namespace Logic
 
             validTags = _mediaData;
 
-            if (originId != -1)
+            if (validTags)
             {
-                validOrigin = _mediaData
+                if (originId != -1)
+                {
+                    validOrigin = await _mediaData.IsValidMediaOrigin(originId);
+                }
+                else
+                {
+                    validOrigin = true;
+                }
+
+                if (validOrigin)
+                {
+                    if (typeId != -1)
+                    {
+                        validType = await _mediaData.IsValidMediaType(typeId);
+                    }
+                    else 
+                    { 
+                        validType = true; 
+                    }
+                }
             }
         }
     }

@@ -8,5 +8,15 @@ namespace Data
         {
             throw new NotImplementedException();
         }
+
+        public Task<bool> IsValidMediaOrigin(int originId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> IsValidMediaType(int typeId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

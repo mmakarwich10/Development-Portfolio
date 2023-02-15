@@ -11,8 +11,8 @@ namespace TaggedMediaServerWeb.Controllers
         public IActionResult GetMedia(
             [FromQuery(Name = "include-deprecated")] bool includeDeprecated = false, 
             [FromQuery(Name = "include-non-depr-dissociated")] bool includeNonDeprDissociated = false,
-            [FromQuery(Name = "origin")] int originId = 0,
-            [FromQuery(Name = "type")] int typeId = 0,
+            [FromQuery(Name = "origin")] int originId = -1,
+            [FromQuery(Name = "type")] int typeId = -1,
             [FromQuery] bool archived = false)
         {
             string?[] tagList = HttpContext.Request.Query["tag"].ToArray();
@@ -25,12 +25,12 @@ namespace TaggedMediaServerWeb.Controllers
                 }
             }
 
-            if (originId < 0)
+            if (originId < -1)
             {
                 return BadRequest("Origin ID cannot be less than zero.");
             }
 
-            if (typeId < 0)
+            if (typeId < -1)
             {
                 return BadRequest("Type ID cannot be less than zero.");
             }

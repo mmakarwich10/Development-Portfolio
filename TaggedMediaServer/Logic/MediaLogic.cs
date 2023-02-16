@@ -1,6 +1,6 @@
 ﻿using Data.Media;
 using Data.Tags;
-using Models;
+using Models.Dtos;
 
 namespace Logic
 {

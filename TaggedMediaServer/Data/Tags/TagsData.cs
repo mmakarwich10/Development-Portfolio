@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace Data.Tags
                 }
                 catch (Exception ex)
                 {
-
+                    throw new DatabaseException();
                 }
             }
 

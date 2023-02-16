@@ -23,7 +23,7 @@ namespace Logic
 
             foreach (var tagName in tagList)
             {
-                if (!(await _tagsData.IsValidTag(tagName)))
+                if (!(await _tagsData.TagExists(tagName)))
                 {
                     validTags = false;
                 }

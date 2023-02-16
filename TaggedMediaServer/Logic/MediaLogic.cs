@@ -9,6 +9,12 @@ namespace Logic
         private IMediaData _mediaData;
         private ITagsData _tagsData;
 
+        public MediaLogic(IMediaData mediaData, ITagsData tagsData)
+        {
+            _mediaData = mediaData;
+            _tagsData = tagsData;
+        }
+
         public async Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
             bool validTags = true;

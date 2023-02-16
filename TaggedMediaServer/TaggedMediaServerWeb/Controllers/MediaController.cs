@@ -11,6 +11,11 @@ namespace TaggedMediaServerWeb.Controllers
     {
         private IMediaLogic _mediaLogic;
 
+        public MediaController(IMediaLogic mediaLogic)
+        {
+            _mediaLogic = mediaLogic;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetMedia(
             [FromQuery(Name = "include-deprecated")] bool includeDeprecated = false, 

@@ -52,11 +52,11 @@ namespace TaggedMediaServerWeb.Controllers
             try
             {
                 List<MediumDto> returnedMedia = await _mediaLogic.GetMediaWithFilters(cleanTagList, includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
+                return Ok(returnedMedia);
             }
             catch (Exception)
             {
-
-                throw;
+                return BadRequest("");
             }
         }
     }

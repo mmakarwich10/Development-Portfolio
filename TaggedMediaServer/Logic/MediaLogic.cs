@@ -50,7 +50,24 @@ namespace Logic
                     { 
                         validType = true; 
                     }
+
+                    if (validType)
+                    {
+                        return new List<MediumDto>();
+                    }
+                    else
+                    {
+                        throw new Exception();
+                    }
                 }
+                else
+                {
+                    throw new Exception();
+                }
+            }
+            else
+            {
+                throw new Exception();
             }
         }
     }

@@ -8,6 +8,6 @@ namespace Data
 {
     public class BaseData
     {
-        protected string ConnectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=TaggedMediaServer;Integrated Security=True";
+        protected string ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=TaggedMediaServer;Integrated Security=True";
     }
 }

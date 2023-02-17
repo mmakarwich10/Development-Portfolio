@@ -15,7 +15,7 @@ namespace Data.Tags
             bool tagExists = false;
             string queryString =
                 "SELECT * FROM dbo.Tags " +
-                "WHERE Name = " + tagName + ";";
+                "WHERE Name = '" + tagName + "';";
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {

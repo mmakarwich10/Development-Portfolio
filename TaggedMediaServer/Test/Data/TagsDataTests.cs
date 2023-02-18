@@ -1,6 +1,6 @@
 using Data.Tags;
 
-namespace Test
+namespace Test.Data
 {
     public class TagsDataTests
     {
@@ -13,7 +13,7 @@ namespace Test
         }
 
         [Test]
-        public async Task TagExists_ExistingTagShouldReturnTrue()
+        public async Task TagExistsAsync_ExistingTagShouldReturnTrue()
         {
             // Arrange
             bool actualResult = false;

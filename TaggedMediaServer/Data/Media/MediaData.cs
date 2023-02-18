@@ -15,7 +15,7 @@ namespace Data.Media
         {
             bool originExists = false;
             string queryString =
-                "SELECT * FROM dbo.MediaOriginTypes" +
+                "SELECT * FROM dbo.MediaOriginTypes " +
                 "WHERE Id = " + originId + ";";
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))

@@ -38,9 +38,31 @@ namespace Data.Media
             return originExists;
         }
 
-        public Task<bool> MediaTypeExistsAsync(int typeId)
+        public async Task<bool> MediaTypeExistsAsync(int typeId)
         {
-            throw new NotImplementedException();
+            bool typeExists = false;
+            string queryString =
+                "SELECT * FROM dbo.MediaTypes " +
+                "WHERE Id = " + typeId + ";";
+
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    typeExists = reader.Read();
+                    reader.Close();
+                }
+                catch (Exception)
+                {
+                    throw new DatabaseException();
+                }
+            }
+
+            return typeExists;
         }
     }
 }

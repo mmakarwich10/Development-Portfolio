@@ -29,5 +29,18 @@ namespace Test.Data
             // Assert
             Assert.IsTrue(actualResult);
         }
+
+        [Test]
+        public async Task MediaTypeExistsAsync_ExistingTypeShouldReturnTrue()
+        {
+            // Arrange
+            bool actualResult = false;
+
+            // Act
+            actualResult = await _mediaData.MediaTypeExistsAsync(0);
+
+            // Assert
+            Assert.IsTrue(actualResult);
+        }
     }
 }

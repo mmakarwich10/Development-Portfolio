@@ -2,6 +2,11 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Dtos;
+using Models.Exceptions;
+using System.Net;
+using System.Web.Http;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
+using RouteAttribute = Microsoft.AspNetCore.Mvc.RouteAttribute;
 
 namespace TaggedMediaServerWeb.Controllers
 {
@@ -31,7 +36,7 @@ namespace TaggedMediaServerWeb.Controllers
             {
                 if (tag == null)
                 {
-                    return BadRequest("One or more tags in the query are null.");
+                    return UnprocessableEntity("One or more tags in the query are null.");
                 }
                 else
                 {
@@ -41,22 +46,28 @@ namespace TaggedMediaServerWeb.Controllers
 
             if (originId < -1)
             {
-                return BadRequest("Origin ID cannot be less than -1.");
+                return UnprocessableEntity("Origin ID cannot be less than -1.");
             }
 
             if (typeId < -1)
             {
-                return BadRequest("Type ID cannot be less than -1.");
+                return UnprocessableEntity("Type ID cannot be less than -1.");
             }
 
             try
             {
-                List<MediumDto> returnedMedia = await _mediaLogic.GetMediaWithFilters(cleanTagList, includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
+                List<MediumDto> returnedMedia = await _mediaLogic.GetMediaWithFiltersAsync(cleanTagList, includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
                 return Ok(returnedMedia);
             }
-            catch (Exception)
+            catch (DatabaseException)
             {
-                return BadRequest("");
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.InternalServerError)
+                {
+                    Content = new StringContent(
+                        "There was an issue during database operations. Please try the request again. If you continue to get this message, notify your administrator."
+                    )
+                };
+                throw new HttpResponseException(response);
             }
         }
     }

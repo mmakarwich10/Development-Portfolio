@@ -8,6 +8,6 @@ namespace Data.Tags
 {
     public interface ITagsData
     {
-        Task<bool> TagExists(string tagName);
+        Task<bool> TagExistsAsync(string tagName);
     }
 }

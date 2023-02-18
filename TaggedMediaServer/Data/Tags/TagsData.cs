@@ -10,7 +10,7 @@ namespace Data.Tags
 {
     public class TagsData : BaseData, ITagsData
     {
-        public async Task<bool> TagExists(string tagName)
+        public async Task<bool> TagExistsAsync(string tagName)
         {
             bool tagExists = false;
             string queryString =
@@ -24,11 +24,11 @@ namespace Data.Tags
                 try
                 {
                     connection.Open();
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     tagExists = reader.Read();
                     reader.Close();
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     throw new DatabaseException();
                 }

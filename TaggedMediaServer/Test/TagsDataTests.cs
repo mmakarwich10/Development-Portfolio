@@ -19,7 +19,7 @@ namespace Test
             bool actualResult = false;
 
             // Act
-            actualResult = await _tagsData.TagExists("Test Tag");
+            actualResult = await _tagsData.TagExistsAsync("Test Tag");
 
             // Assert
             Assert.IsTrue(actualResult);

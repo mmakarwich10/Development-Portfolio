@@ -15,7 +15,8 @@ namespace Logic
             _tagsData = tagsData;
         }
 
-        public async Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
+        public async Task<List<MediumDto>> GetMediaWithFiltersAsync(
+            List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
             bool validTags = true;
             bool validOrigin = false;
@@ -23,7 +24,7 @@ namespace Logic
 
             foreach (var tagName in tagList)
             {
-                if (!(await _tagsData.TagExists(tagName)))
+                if (!(await _tagsData.TagExistsAsync(tagName)))
                 {
                     validTags = false;
                 }
@@ -33,7 +34,7 @@ namespace Logic
             {
                 if (originId != -1)
                 {
-                    validOrigin = await _mediaData.IsValidMediaOrigin(originId);
+                    validOrigin = await _mediaData.MediaOriginExistsAsync(originId);
                 }
                 else
                 {
@@ -44,7 +45,7 @@ namespace Logic
                 {
                     if (typeId != -1)
                     {
-                        validType = await _mediaData.IsValidMediaType(typeId);
+                        validType = await _mediaData.MediaTypeExistsAsync(typeId);
                     }
                     else 
                     { 

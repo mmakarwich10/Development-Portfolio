@@ -9,8 +9,8 @@ namespace Data.Media
 {
     public interface IMediaData
     {
-        Task<List<MediumDto>> GetMediaWithFilters(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived);
-        Task<bool> IsValidMediaOrigin(int originId);
-        Task<bool> IsValidMediaType(int typeId);
+        Task<List<MediumDto>> GetMediaWithFiltersAsync(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived);
+        Task<bool> MediaOriginExistsAsync(int originId);
+        Task<bool> MediaTypeExistsAsync(int typeId);
     }
 }

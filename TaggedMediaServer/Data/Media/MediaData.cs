@@ -1,5 +1,4 @@
-﻿using Data.Tags;
-using Models.Dtos;
+﻿using Models.Dtos;
 using Models.Exceptions;
 using System.Data;
 using System.Data.SqlClient;
@@ -8,30 +7,25 @@ namespace Data.Media
 {
     public class MediaData : BaseData, IMediaData
     {
-        private ITagsData _tagsData;
-        public MediaData(ITagsData tagsData)
-        {
-            _tagsData = tagsData;
-        }
-
         public async Task<List<MediumDto>> GetMediaWithFiltersAsync(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
+            List<MediumDto> resultList = new List<MediumDto>();
             string queryString =
                 "SELECT m.Id, m.TypeId, m.OriginId, m.LocalPath, m.ExtPath, m.IsArchived " +
-                "FROM dbo.Media m" +
+                "FROM dbo.Media m " +
                 "LEFT JOIN dbo.MediumTag mt ON mt.MediumId = m.Id " +
                 "LEFT JOIN dbo.Tags t ON t.Id = mt.TagId " +
                 "WHERE (@TagList IS NULL OR mt.TagId IN (SELECT value FROM STRING_SPLIT(@TagList, ','))) AND " +
                     "(@IncludeNonDeprDissociated = 1 OR (@IncludeNonDeprDissociated = 0 AND mt.IsDissociated = 0)) AND " +
                     "(@IncludeDeprecated = 1 OR (@IncludeDeprecated = 0 AND t.IsDeprecated = 0)) AND " +
-                    "(@OriginId = -1 OR OriginId = @OriginId) AND " +
-                    "(@TypeId = -1 OR TypeId = @TypeId) AND " +
-                    "(IsArchived = @IsArchived);";
+                    "(@OriginId = -1 OR m.OriginId = @OriginId) AND " +
+                    "(@TypeId = -1 OR m.TypeId = @TypeId) AND " +
+                    "(m.IsArchived = @IsArchived);";
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
                 SqlCommand cmd = new SqlCommand(queryString, connection);
-                cmd.Parameters.AddWithValue("@TagList", string.Join(",", tagList.Select(x => x.ToString()).ToArray()));
+                cmd.Parameters.AddWithValue("@TagList", tagList.Count <= 0 ? DBNull.Value : string.Join(",", tagList.Select(x => x.ToString()).ToArray()));
                 cmd.Parameters.AddWithValue("@IncludeNonDeprDissociated", includeNonDeprDissociated);
                 cmd.Parameters.AddWithValue("@IncludeDeprecated", includeDeprecated);
                 cmd.Parameters.AddWithValue("@OriginId", originId);
@@ -51,21 +45,23 @@ namespace Data.Media
                             Id = reader.GetInt32("Id"),
                             TypeId = reader.GetInt32("TypeId"),
                             OriginId = reader.GetInt32("OriginId"),
-                            LocalPath = reader.GetString("LocalPath"),
-                            ExtPath = reader.GetString("ExtPath"),
+                            LocalPath = reader.IsDBNull("ExtPath") ? "" : reader.GetString("LocalPath"),
+                            ExtPath = reader.IsDBNull("ExtPath") ? "" : reader.GetString("ExtPath"),
                             IsArchived = reader.GetBoolean("IsArchived")
                         };
 
-                        medium.CurrentTags = await _tagsData.GetCurrentTagsByMediumIdAsync(medium.Id);
+                        resultList.Add(medium);
                     }
 
                     reader.Close();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                     throw new DatabaseException();
                 }
             }
+
+            return resultList;
         }
 
         public async Task<bool> MediumOriginExistsAsync(int originId)

@@ -12,6 +12,8 @@ namespace Test.Data
             _tagsData = new TagsData();
         }
 
+        // TODO: Create happy path test for GetCurrentTagsByMediumId.
+
         [Test]
         public async Task TagExistsAsync_ExistingTagShouldReturnTrue()
         {

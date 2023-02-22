@@ -34,7 +34,7 @@ namespace Logic
             {
                 if (originId != -1)
                 {
-                    validOrigin = await _mediaData.MediaOriginExistsAsync(originId);
+                    validOrigin = await _mediaData.MediumOriginExistsAsync(originId);
                 }
                 else
                 {
@@ -45,7 +45,7 @@ namespace Logic
                 {
                     if (typeId != -1)
                     {
-                        validType = await _mediaData.MediaTypeExistsAsync(typeId);
+                        validType = await _mediaData.MediumTypeExistsAsync(typeId);
                     }
                     else 
                     { 
@@ -54,7 +54,7 @@ namespace Logic
 
                     if (validType)
                     {
-                        return new List<MediumDto>();
+                        return await _mediaData.GetMediaWithFiltersAsync(tagList, includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
                     }
                     else
                     {

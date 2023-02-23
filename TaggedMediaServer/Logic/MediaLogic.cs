@@ -1,6 +1,7 @@
 ﻿using Data.Media;
 using Data.Tags;
 using Models.Dtos;
+using Models.Exceptions;
 
 namespace Logic
 {
@@ -58,17 +59,17 @@ namespace Logic
                     }
                     else
                     {
-                        throw new Exception();
+                        throw new InvalidMediaTypeException();
                     }
                 }
                 else
                 {
-                    throw new Exception();
+                    throw new InvalidMediaOriginException();
                 }
             }
             else
             {
-                throw new Exception();
+                throw new InvalidTagException();
             }
         }
     }

@@ -20,7 +20,8 @@ namespace Data.Media
                     "(@IncludeDeprecated = 1 OR (@IncludeDeprecated = 0 AND t.IsDeprecated = 0)) AND " +
                     "(@OriginId = -1 OR m.OriginId = @OriginId) AND " +
                     "(@TypeId = -1 OR m.TypeId = @TypeId) AND " +
-                    "(m.IsArchived = @IsArchived);";
+                    "(m.IsArchived = @IsArchived) " +
+                "GROUP By m.Id, m.TypeId, m.OriginId, m.LocalPath, m.ExtPath, m.IsArchived;";
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {

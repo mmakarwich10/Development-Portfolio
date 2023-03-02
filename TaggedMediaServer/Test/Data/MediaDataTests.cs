@@ -27,22 +27,43 @@ namespace Test.Data
         {
             // Arrange
             List<MediumDto> returnedMedia;
-            const string TAG_ID = "1";
-            List<string> tagList = new List<string> { TAG_ID };
-
-            // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(tagList, false, false, -1, -1, false);
-
-            // Assert
-            int expectedCount = 0;
-            string queryString =
-                "SELECT COUNT(m.Id) AS Count " +
-                "FROM dbo.Media m " +
-                "LEFT JOIN dbo.MediumTag mt ON mt.MediumId = m.Id " +
-                "WHERE mt.TagId = " + TAG_ID + " AND m.IsArchived = 0;";
+            string tagId = "-1";
+            int medium1Id = -1;
+            int medium2Id = -1;
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
+                string queryString =
+                    "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
+                    "VALUES " +
+                    "('Testing Temp Tag', 0, 0, 0) " +
+                    "; " +
+                    "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
+                    "VALUES " +
+                    "(0, 0, 'Test Medium Path', 0), " +
+                    "(0, 0, 'Test Medium 2 Path', 0) " +
+                    "; " +
+                    "DECLARE @TagId INT; " +
+                    "DECLARE @Medium1Id INT; " +
+                    "DECLARE @Medium2Id INT; " +
+                    "; " +
+                    "SELECT @TagId = Id FROM dbo.Tags " +
+                    "WHERE Name = 'Testing Temp Tag'" +
+                    "; " +
+                    "SELECT @Medium1Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium Path'" +
+                    "; " +
+                    "SELECT @Medium2Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium 2 Path'" +
+                    "; " +
+                    "INSERT INTO dbo.MediumTag (MediumId, TagId, IsDissociated) " +
+                    "VALUES (@Medium1Id, @TagId, 0)" +
+                    "; " +
+                    "INSERT INTO dbo.MediumTag (MediumId, TagId, IsDissociated) " +
+                    "VALUES (@Medium2Id, @TagId, 0)" +
+                    "; " +
+                    "SELECT @TagId, @Medium1Id, @Medium2Id";
+
                 SqlCommand cmd = new SqlCommand(queryString, connection);
 
                 try
@@ -52,18 +73,45 @@ namespace Test.Data
 
                     if (reader.Read())
                     {
-                        expectedCount = reader.GetInt32(0);
+                        tagId = reader.GetInt32(0).ToString();
+                        medium1Id = reader.GetInt32(1);
+                        medium2Id = reader.GetInt32(2);
                     }
-
-                    reader.Close();
                 }
-                catch (Exception)
-                {
-                    throw new DatabaseException();
-                }
+                catch (Exception) { throw new DatabaseException(); }
             }
 
-            Assert.That(returnedMedia.Count, Is.EqualTo(expectedCount));
+            List<string> tagList = new List<string> { tagId };
+
+            // Act
+            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(tagList, false, false, -1, -1, false);
+
+            // Clean-up
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string queryString =
+                    "DELETE FROM dbo.MediumTag " +
+                    "WHERE TagId = " + tagId +
+                    "; " +
+                    "DELETE FROM dbo.Tags " +
+                    "WHERE Id IN (" + tagId + ")" +
+                    "; " +
+                    "DELETE FROM dbo.Media " +
+                    "WHERE Id IN (" + medium1Id + "," + medium2Id + ");";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    reader.Close();
+                }
+                catch (Exception) { throw new DatabaseException(); }
+            }
+
+            // Assert
+            Assert.That(returnedMedia.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -123,6 +171,7 @@ namespace Test.Data
                 }
                 catch (Exception) { throw new DatabaseException(); }
             }
+
             List<string> tagList = new List<string> { tagId1, tagId2 };
 
             // Act

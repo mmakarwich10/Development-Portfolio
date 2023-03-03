@@ -31,7 +31,7 @@ namespace Test.Logic
         {
             // Arrange
             _mockMediaData.Setup(x => x.MediumTypeExistsAsync(It.IsAny<int>())).ReturnsAsync(true);
-            _mockMediaData.Setup(y => y.GetMediaWithFiltersAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
+            _mockMediaData.Setup(y => y.GetMediaWithFiltersAndTagFilterAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .ReturnsAsync(new List<MediumDto>());
             _mockTagsData.Setup(z => z.TagExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
 
@@ -46,7 +46,7 @@ namespace Test.Logic
         {
             // Arrange
             _mockMediaData.Setup(x => x.MediumOriginExistsAsync(It.IsAny<int>())).ReturnsAsync(true);
-            _mockMediaData.Setup(y => y.GetMediaWithFiltersAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
+            _mockMediaData.Setup(y => y.GetMediaWithFiltersAndTagFilterAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .ReturnsAsync(new List<MediumDto>());
             _mockTagsData.Setup(z => z.TagExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
 
@@ -65,7 +65,7 @@ namespace Test.Logic
 
             _mockMediaData.Setup(w => w.MediumOriginExistsAsync(It.IsAny<int>())).ReturnsAsync(true);
             _mockMediaData.Setup(x => x.MediumTypeExistsAsync(It.IsAny<int>())).ReturnsAsync(true);
-            _mockMediaData.Setup(y => y.GetMediaWithFiltersAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
+            _mockMediaData.Setup(y => y.GetMediaWithFiltersAndTagFilterAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .ReturnsAsync(new List<MediumDto>());
             _mockTagsData.Setup(z => z.TagExistsAsync(TAG_ID)).ReturnsAsync(false);
 
@@ -83,7 +83,7 @@ namespace Test.Logic
 
             _mockMediaData.Setup(w => w.MediumOriginExistsAsync(ORIGIN_ID)).ReturnsAsync(false);
             _mockMediaData.Setup(x => x.MediumTypeExistsAsync(It.IsAny<int>())).ReturnsAsync(true);
-            _mockMediaData.Setup(y => y.GetMediaWithFiltersAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
+            _mockMediaData.Setup(y => y.GetMediaWithFiltersAndTagFilterAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .ReturnsAsync(new List<MediumDto>());
             _mockTagsData.Setup(z => z.TagExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
 
@@ -101,7 +101,7 @@ namespace Test.Logic
 
             _mockMediaData.Setup(w => w.MediumOriginExistsAsync(It.IsAny<int>())).ReturnsAsync(true);
             _mockMediaData.Setup(x => x.MediumTypeExistsAsync(TYPE_ID)).ReturnsAsync(false);
-            _mockMediaData.Setup(y => y.GetMediaWithFiltersAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
+            _mockMediaData.Setup(y => y.GetMediaWithFiltersAndTagFilterAsync(It.IsAny<List<string>>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
                 .ReturnsAsync(new List<MediumDto>());
             _mockTagsData.Setup(z => z.TagExistsAsync(It.IsAny<string>())).ReturnsAsync(true);
 

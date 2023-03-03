@@ -2,18 +2,69 @@
 using Models.Exceptions;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 
 namespace Data.Media
 {
     public class MediaData : BaseData, IMediaData
     {
-        public async Task<List<MediumDto>> GetMediaWithFiltersAsync(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
+        public async Task<List<MediumDto>> GetMediaWithFiltersAsync(int originId, int typeId, bool archived)
         {
             List<MediumDto> resultList = new List<MediumDto>();
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
-                SqlCommand cmd = new SqlCommand("GetMediaWithFilters", connection);
+                string queryString =
+                    "SELECT Id, TypeId, OriginId, LocalPath, ExtPath, IsArchived " +
+                    "FROM dbo.Media " +
+                    "WHERE (@OriginId = -1 OR m.OriginId = @OriginId) AND " +
+                        "(@TypeId = -1 OR m.TypeId = @TypeId) AND " +
+                        "IsArchived = @IsArchived";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+                cmd.Parameters.AddWithValue("@OriginId", originId);
+                cmd.Parameters.AddWithValue("@TypeId", typeId);
+                cmd.Parameters.AddWithValue("@IsArchived", archived);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    MediumDto medium;
+                    while (reader.Read())
+                    {
+                        medium = new MediumDto
+                        {
+                            Id = reader.GetInt32("Id"),
+                            TypeId = reader.GetInt32("TypeId"),
+                            OriginId = reader.GetInt32("OriginId"),
+                            LocalPath = reader.IsDBNull("ExtPath") ? "" : reader.GetString("LocalPath"),
+                            ExtPath = reader.IsDBNull("ExtPath") ? "" : reader.GetString("ExtPath"),
+                            IsArchived = reader.GetBoolean("IsArchived")
+                        };
+
+                        resultList.Add(medium);
+                    }
+
+                    reader.Close();
+                }
+                catch (Exception e)
+                {
+                    throw new DatabaseException();
+                }
+            }
+
+            return resultList;
+        }
+
+        public async Task<List<MediumDto>> GetMediaWithFiltersAndTagFilterAsync(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
+        {
+            List<MediumDto> resultList = new List<MediumDto>();
+
+            using (SqlConnection connection = new SqlConnection(ConnectionString))
+            {
+                SqlCommand cmd = new SqlCommand("GetMediaWithFiltersAndTagFilter", connection);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@TagList", tagList.Count <= 0 ? DBNull.Value : string.Join(",", tagList.Select(x => x.ToString()).ToArray()));
                 cmd.Parameters.AddWithValue("@IncludeNonDeprDissociated", includeNonDeprDissociated);

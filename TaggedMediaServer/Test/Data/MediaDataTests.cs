@@ -84,7 +84,7 @@ namespace Test.Data
             List<string> tagList = new List<string> { tagId };
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(tagList, false, false, -1, -1, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, -1, -1, false);
 
             // Clean-up
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -175,7 +175,7 @@ namespace Test.Data
             List<string> tagList = new List<string> { tagId1, tagId2 };
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(tagList, false, false, -1, -1, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, -1, -1, false);
 
             // Clean-up
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -274,7 +274,7 @@ namespace Test.Data
             List<string> tagList = new List<string> { tag1Id, tag2Id };
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(tagList, false, false, 0, 0, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, 0, 0, false);
 
             // Clean-up
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -287,7 +287,7 @@ namespace Test.Data
                     "WHERE Id IN (" + tag1Id + "," + tag2Id + ")" +
                     "; " +
                     "DELETE FROM dbo.Media " +
-                    "WHERE Id IN (" + medium1Id + "," + medium2Id + ")" + ";";
+                    "WHERE Id IN (" + medium1Id + "," + medium2Id + ");";
 
                 SqlCommand cmd = new SqlCommand(queryString, connection);
 
@@ -311,7 +311,7 @@ namespace Test.Data
             List<MediumDto> returnedMedia = new List<MediumDto>();
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(new List<string>(), false, false, 0, 0, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(new List<string>(), false, false, 0, 0, false);
 
             // Assert
             Assert.That(returnedMedia.Count, Is.AtLeast(1));
@@ -384,7 +384,7 @@ namespace Test.Data
             }
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(new List<string>(), false, false, 0, 0, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(new List<string>(), false, false, 0, 0, false);
 
             // Clean-up
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -425,7 +425,7 @@ namespace Test.Data
             const int ORIGIN_ID = 0;
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(new List<string>(), true, true, ORIGIN_ID, -1, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(new List<string>(), true, true, ORIGIN_ID, -1, false);
 
             // Assert
             foreach (var media in returnedMedia)
@@ -447,7 +447,7 @@ namespace Test.Data
             List<string> tagIds = new List<string> { "-1" };
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(tagIds, false, false, -2, -2, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagIds, false, false, -2, -2, false);
 
             // Assert
             Assert.That(returnedMedia.Count, Is.EqualTo(0));

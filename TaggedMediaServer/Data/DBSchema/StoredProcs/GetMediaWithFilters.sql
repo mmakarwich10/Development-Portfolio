@@ -3,7 +3,7 @@
 -- Create date: 2/20/23
 -- Description:	Returns a filtered list of Medium records
 -- =============================================
-CREATE OR ALTER PROCEDURE [dbo].[GetMediaWithFilters] 
+CREATE OR ALTER PROCEDURE [dbo].[GetMediaWithFiltersAndTagFilter] 
 	@TagList varchar(100) = NULL, 
 	@IncludeDeprecated bit = 0,
 	@IncludeNonDeprDissociated bit = 0,

@@ -10,22 +10,11 @@ namespace Data.Media
         public async Task<List<MediumDto>> GetMediaWithFiltersAsync(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
             List<MediumDto> resultList = new List<MediumDto>();
-            string queryString =
-                "SELECT m.Id, m.TypeId, m.OriginId, m.LocalPath, m.ExtPath, m.IsArchived " +
-                "FROM dbo.Media m " +
-                "LEFT JOIN dbo.MediumTag mt ON mt.MediumId = m.Id " +
-                "LEFT JOIN dbo.Tags t ON t.Id = mt.TagId " +
-                "WHERE (@TagList IS NULL OR mt.TagId IN (SELECT value FROM STRING_SPLIT(@TagList, ','))) AND " +
-                    "(@IncludeNonDeprDissociated = 1 OR (@IncludeNonDeprDissociated = 0 AND mt.IsDissociated = 0)) AND " +
-                    "(@IncludeDeprecated = 1 OR (@IncludeDeprecated = 0 AND t.IsDeprecated = 0)) AND " +
-                    "(@OriginId = -1 OR m.OriginId = @OriginId) AND " +
-                    "(@TypeId = -1 OR m.TypeId = @TypeId) AND " +
-                    "(m.IsArchived = @IsArchived) " +
-                "GROUP By m.Id, m.TypeId, m.OriginId, m.LocalPath, m.ExtPath, m.IsArchived;";
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))
             {
-                SqlCommand cmd = new SqlCommand(queryString, connection);
+                SqlCommand cmd = new SqlCommand("GetMediaWithFilters", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@TagList", tagList.Count <= 0 ? DBNull.Value : string.Join(",", tagList.Select(x => x.ToString()).ToArray()));
                 cmd.Parameters.AddWithValue("@IncludeNonDeprDissociated", includeNonDeprDissociated);
                 cmd.Parameters.AddWithValue("@IncludeDeprecated", includeDeprecated);

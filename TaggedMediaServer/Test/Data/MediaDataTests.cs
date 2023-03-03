@@ -203,7 +203,118 @@ namespace Test.Data
 
             // Assert
             Assert.That(returnedMedia.Count, Is.EqualTo(1));
+        }
 
+        [Test]
+        public async Task GetMediaWithFiltersAsync_ShouldOnlyReturnMediaAssociatedWithAllGivenTags()
+        {
+            // Arrange
+            List<MediumDto> returnedMedia = new List<MediumDto>();
+            string tag1Id = "-1";
+            string tag2Id = "-1";
+            int medium1Id = -1;
+            int medium2Id = -1;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string queryString =
+                    "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
+                    "VALUES " +
+                    "('Testing Temp Tag', 0, 0, 0), " +
+                    "('Testing Temp Tag 2', 0, 0, 0)" +
+                    "; " +
+                    "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
+                    "VALUES " +
+                    "(0, 0, 'Test Medium Path', 0), " +
+                    "(0, 0, 'Test Medium Path 2', 0)" +
+                    "; " +
+                    "DECLARE @Medium1Id INT; " +
+                    "DECLARE @Medium2Id INT; " +
+                    "DECLARE @Tag1Id INT; " +
+                    "DECLARE @Tag2Id INT" +
+                    "; " +
+                    "SELECT @Tag1Id = Id FROM dbo.Tags " +
+                    "WHERE Name = 'Testing Temp Tag'" +
+                    "; " +
+                    "SELECT @Tag2Id = Id FROM dbo.Tags " +
+                    "WHERE Name = 'Testing Temp Tag 2'" +
+                    "; " +
+                    "SELECT @Medium1Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium Path'" +
+                    "; " +
+                    "SELECT @Medium2Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium Path 2'" +
+                    "; " +
+                    "INSERT INTO dbo.MediumTag (MediumId, TagId, IsDissociated) " +
+                    "VALUES " +
+                    "(@Medium1Id, @Tag1Id, 0), " +
+                    "(@Medium1Id, @Tag2Id, 0)," +
+                    "(@Medium2Id, @Tag1Id, 0)" +
+                    "; " +
+                    "SELECT @Tag1Id, @Tag2Id, @Medium1Id, @Medium2Id";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    if (reader.Read())
+                    {
+                        tag1Id = reader.GetInt32(0).ToString();
+                        tag2Id = reader.GetInt32(1).ToString();
+                        medium1Id = reader.GetInt32(2);
+                        medium2Id = reader.GetInt32(3);
+                    }
+                }
+                catch (Exception) { throw new DatabaseException(); }
+            }
+
+            List<string> tagList = new List<string> { tag1Id, tag2Id };
+
+            // Act
+            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(tagList, false, false, 0, 0, false);
+
+            // Clean-up
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string queryString =
+                    "DELETE FROM dbo.MediumTag " +
+                    "WHERE MediumId IN (" + medium1Id + "," + medium2Id + ")" +
+                    "; " +
+                    "DELETE FROM dbo.Tags " +
+                    "WHERE Id IN (" + tag1Id + "," + tag2Id + ")" +
+                    "; " +
+                    "DELETE FROM dbo.Media " +
+                    "WHERE Id IN (" + medium1Id + "," + medium2Id + ")" + ";";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    reader.Close();
+                }
+                catch (Exception) { throw new DatabaseException(); }
+            }
+
+            // Assert
+            Assert.That(returnedMedia.Count, Is.EqualTo(1));
+        }
+
+        [Test]
+        public async Task GetMediaWithFiltersAsync_EmptyTagListShouldNotReturnEmptyMediaList()
+        {
+            // Arrange
+            List<MediumDto> returnedMedia = new List<MediumDto>();
+
+            // Act
+            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(new List<string>(), false, false, 0, 0, false);
+
+            // Assert
+            Assert.That(returnedMedia.Count, Is.AtLeast(1));
         }
 
         [Test]

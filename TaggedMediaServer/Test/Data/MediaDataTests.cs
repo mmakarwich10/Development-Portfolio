@@ -22,8 +22,120 @@ namespace Test.Data
             _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=TaggedMediaServer;Integrated Security=True";
         }
 
+        #region GetMediaWithFilters
+
+        [Test]
+        public async Task GetMediaWithFiltersAsync_AllMediaReturnedShouldBeDistinct()
+        {
+            // Arrange
+            List<MediumDto> returnedMedia = new List<MediumDto>();
+            int medium1Id = -1;
+            int medium2Id = -1;
+
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string queryString =
+                    "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
+                    "VALUES " +
+                    "(0, 0, 'Test Medium Path', 0), " +
+                    "(0, 0, 'Test Medium Path 2', 0)" +
+                    "; " +
+                    "DECLARE @Medium1Id INT; " +
+                    "DECLARE @Medium2Id INT; " +
+                    "; " +
+                    "SELECT @Medium1Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium Path'" +
+                    "; " +
+                    "SELECT @Medium2Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium Path 2'" +
+                    "; " +
+                    "SELECT @Medium1Id, @Medium2Id";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    if (reader.Read())
+                    {
+                        medium1Id = reader.GetInt32(0);
+                        medium2Id = reader.GetInt32(1);
+                    }
+                }
+                catch (Exception) { throw new DatabaseException(); }
+            }
+
+            // Act
+            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(0, 0, false);
+
+            // Clean-up
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string queryString =
+                    "DELETE FROM dbo.Media " +
+                    "WHERE Id IN (" + medium1Id + "," + medium2Id + ")" + ";";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    reader.Close();
+                }
+                catch (Exception) { throw new DatabaseException(); }
+            }
+
+            // Assert
+            foreach (var medium in returnedMedia)
+            {
+                Assert.DoesNotThrow(() => returnedMedia.Single(item => item.Id == medium.Id));
+            }
+        }
+
+        [Test]
+        public async Task GetMediaWithFiltersAsync_AllMediaReturnedShouldBeAssociatedWithGivenOrigin()
+        {
+            // Arrange
+            List<MediumDto> returnedMedia;
+            const int ORIGIN_ID = 0;
+
+            // Act
+            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(ORIGIN_ID, -1, false);
+
+            // Assert
+            foreach (var media in returnedMedia)
+            {
+                if (media.OriginId != ORIGIN_ID)
+                {
+                    Assert.Fail("At least one medium returned did not have the given origin ID");
+                }
+            }
+
+            Assert.Pass();
+        }
+
+        [Test]
+        public async Task GetMediaWithFiltersAsync_NoMatchingMediaShouldReturnEmptyList()
+        {
+            // Arrange
+            List<MediumDto> returnedMedia;
+
+            // Act
+            returnedMedia = await _mediaData.GetMediaWithFiltersAsync(-2, -2, false);
+
+            // Assert
+            Assert.That(returnedMedia.Count, Is.EqualTo(0));
+        }
+
+        #endregion
+
+        #region GetMediaWithFiltersAndTagFilter
+
         [Test] 
-        public async Task GetMediaWithFilterAsync_ShouldReturnAllNonArchivedMediaCurrentlyAssociatedWithGivenTag()
+        public async Task GetMediaWithFiltersAndTagFilterAsync_ShouldReturnAllNonArchivedMediaCurrentlyAssociatedWithGivenTag()
         {
             // Arrange
             List<MediumDto> returnedMedia;
@@ -115,7 +227,7 @@ namespace Test.Data
         }
 
         [Test]
-        public async Task GetMediaWithFilterAsync_ShouldReturnAllNonArchivedMediaCurrentlyAssociatedWithGivenTags()
+        public async Task GetMediaWithFiltersAndTagFilterAsync_ShouldReturnAllNonArchivedMediaCurrentlyAssociatedWithGivenTags()
         {
             // Arrange
             List<MediumDto> returnedMedia;
@@ -206,7 +318,7 @@ namespace Test.Data
         }
 
         [Test]
-        public async Task GetMediaWithFiltersAsync_ShouldOnlyReturnMediaAssociatedWithAllGivenTags()
+        public async Task GetMediaWithFiltersAndTagFilterAsync_ShouldOnlyReturnMediaAssociatedWithAllGivenTags()
         {
             // Arrange
             List<MediumDto> returnedMedia = new List<MediumDto>();
@@ -305,20 +417,16 @@ namespace Test.Data
         }
 
         [Test]
-        public async Task GetMediaWithFiltersAsync_EmptyTagListShouldNotReturnEmptyMediaList()
+        public void GetMediaWithFiltersAndTagFilterAsync_EmptyTagListShouldThrowException()
         {
             // Arrange
-            List<MediumDto> returnedMedia = new List<MediumDto>();
 
-            // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(new List<string>(), false, false, 0, 0, false);
-
-            // Assert
-            Assert.That(returnedMedia.Count, Is.AtLeast(1));
+            // Act/Assert
+            Assert.ThrowsAsync<EmptyTagListException>(async () => await _mediaData.GetMediaWithFiltersAndTagFilterAsync(new List<string>(), false, false, 0, 0, false));
         }
 
         [Test]
-        public async Task GetMediaWithFiltersAsync_AllMediaReturnedShouldBeDistinct()
+        public async Task GetMediaWithFiltersAndTagFilterAsync_AllMediaReturnedShouldBeDistinct()
         {
             // Arrange
             List<MediumDto> returnedMedia = new List<MediumDto>();
@@ -383,8 +491,10 @@ namespace Test.Data
                 catch (Exception) { throw new DatabaseException(); }
             }
 
+            List<string> tagList = new List<string> { tag1Id.ToString(), tag2Id.ToString() };
+
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(new List<string>(), false, false, 0, 0, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, 0, 0, false);
 
             // Clean-up
             using (SqlConnection connection = new SqlConnection(_connectionString))
@@ -418,29 +528,101 @@ namespace Test.Data
         }
 
         [Test] 
-        public async Task GetMediaWithFiltersAsync_AllMediaReturnedShouldBeAssociatedWithGivenOrigin()
+        public async Task GetMediaWithFiltersAndTagFilterAsync_AllMediaReturnedShouldBeAssociatedWithGivenOrigin()
         {
             // Arrange
             List<MediumDto> returnedMedia;
             const int ORIGIN_ID = 0;
+            string tagId = "-1";
+            int medium1Id = -1;
+            int medium2Id = -1;
 
-            // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(new List<string>(), true, true, ORIGIN_ID, -1, false);
-
-            // Assert
-            foreach (var media in returnedMedia)
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                if (media.OriginId != ORIGIN_ID)
+                string queryString =
+                    "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
+                    "VALUES " +
+                    "('Testing Temp Tag', 0, 0, 0) " +
+                    "; " +
+                    "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
+                    "VALUES " +
+                    "(0, " + ORIGIN_ID + ", 'Test Medium Path', 0), " +
+                    "(0, " + ORIGIN_ID + ", 'Test Medium Path 2', 0)" +
+                    "; " +
+                    "DECLARE @Medium1Id INT; " +
+                    "DECLARE @Medium2Id INT; " +
+                    "DECLARE @TagId INT; " +
+                    "; " +
+                    "SELECT @TagId = Id FROM dbo.Tags " +
+                    "WHERE Name = 'Testing Temp Tag'" +
+                    "; " +
+                    "SELECT @Medium1Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium Path'" +
+                    "; " +
+                    "SELECT @Medium2Id = Id FROM dbo.Media " +
+                    "WHERE LocalPath = 'Test Medium Path 2'" +
+                    "; " +
+                    "INSERT INTO dbo.MediumTag (MediumId, TagId, IsDissociated) " +
+                    "VALUES " +
+                    "(@Medium1Id, @TagId, 0), " +
+                    "(@Medium2Id, @TagId, 0)" +
+                    "; " +
+                    "SELECT @TagId, @Medium1Id, @Medium2Id";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
                 {
-                    Assert.Fail("At least one medium returned did not have the given origin ID");
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
+                    if (reader.Read())
+                    {
+                        tagId = reader.GetInt32(0).ToString();
+                        medium1Id = reader.GetInt32(1);
+                        medium2Id = reader.GetInt32(2);
+                    }
                 }
+                catch (Exception) { throw new DatabaseException(); }
             }
 
-            Assert.Pass();
+            List<string> tagList = new List<string> { tagId };
+
+            // Act
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, true, true, ORIGIN_ID, -1, false);
+
+            // Clean-up
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                string queryString =
+                    "DELETE FROM dbo.MediumTag " +
+                    "WHERE MediumId IN (" + medium1Id + "," + medium2Id + ")" +
+                    "; " +
+                    "DELETE FROM dbo.Tags " +
+                    "WHERE Id IN (" + tagId + ")" +
+                    "; " +
+                    "DELETE FROM dbo.Media " +
+                    "WHERE Id IN (" + medium1Id + "," + medium2Id + ")" + ";";
+
+                SqlCommand cmd = new SqlCommand(queryString, connection);
+
+                try
+                {
+                    connection.Open();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
+                    reader.Close();
+                }
+                catch (Exception) { throw new DatabaseException(); }
+            }
+
+            // Assert
+            int actualSameOriginCount = returnedMedia.Where(x => x.OriginId == ORIGIN_ID).Count();
+
+            Assert.That(actualSameOriginCount, Is.EqualTo(returnedMedia.Count));
         }
 
         [Test]
-        public async Task GetMediaWithFiltersAsync_NoMatchingMediaShouldReturnEmptyList()
+        public async Task GetMediaWithFiltersAndTagFilterAsync_NoMatchingMediaShouldReturnEmptyList()
         {
             // Arrange
             List<MediumDto> returnedMedia;
@@ -452,6 +634,8 @@ namespace Test.Data
             // Assert
             Assert.That(returnedMedia.Count, Is.EqualTo(0));
         }
+
+        #endregion
 
         [Test]
         public async Task MediumOriginExistsAsync_ExistingOriginShouldReturnTrue()

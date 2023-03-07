@@ -17,8 +17,8 @@ namespace Data.Media
                 string queryString =
                     "SELECT Id, TypeId, OriginId, LocalPath, ExtPath, IsArchived " +
                     "FROM dbo.Media " +
-                    "WHERE (@OriginId = -1 OR m.OriginId = @OriginId) AND " +
-                        "(@TypeId = -1 OR m.TypeId = @TypeId) AND " +
+                    "WHERE (@OriginId = -1 OR OriginId = @OriginId) AND " +
+                        "(@TypeId = -1 OR TypeId = @TypeId) AND " +
                         "IsArchived = @IsArchived";
 
                 SqlCommand cmd = new SqlCommand(queryString, connection);
@@ -60,6 +60,11 @@ namespace Data.Media
 
         public async Task<List<MediumDto>> GetMediaWithFiltersAndTagFilterAsync(List<string> tagList, bool includeDeprecated, bool includeNonDeprDissociated, int originId, int typeId, bool archived)
         {
+            if (tagList.Count == 0)
+            {
+                throw new EmptyTagListException();
+            }
+
             List<MediumDto> resultList = new List<MediumDto>();
 
             using (SqlConnection connection = new SqlConnection(ConnectionString))

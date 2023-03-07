@@ -55,7 +55,14 @@ namespace Logic
 
                     if (validType)
                     {
-                        return await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, includeDeprecated, includeNonDeprDissociated, originId, typeId, archived);
+                        if (tagList.Count == 0)
+                        {
+                            return await _mediaData.GetMediaWithFiltersAsync(originId, typeId, archived);
+                        }
+                        else
+                        { 
+                            return await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, includeDeprecated, includeNonDeprDissociated, originId, typeId, archived); 
+                        }
                     }
                     else
                     {

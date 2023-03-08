@@ -12,7 +12,6 @@ namespace Models.Dtos
         public string Name { get; set; } = string.Empty;
         public int TypeId { get; set; }
         public int OriginId { get; set; }
-        public List<TagDto>? Implications { get; set; }
         public bool IsDeprecated { get; set; }
     }
 }

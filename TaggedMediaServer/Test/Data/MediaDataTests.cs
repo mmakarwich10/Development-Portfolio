@@ -14,12 +14,14 @@ namespace Test.Data
     {
         private IMediaData _mediaData;
         private string _connectionString;
+        private const string TAG_NAME = "Testing Temp Tag";
 
         [SetUp]
         public void Setup()
         {
             _mediaData = new MediaData();
             _connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=TaggedMediaServer;Integrated Security=True";
+            //TODO: Move the connection string into a config file.
         }
 
         #region GetMediaWithFilters
@@ -71,6 +73,7 @@ namespace Test.Data
             returnedMedia = await _mediaData.GetMediaWithFiltersAsync(0, 0, false);
 
             // Clean-up
+            //TODO: Wrap all clean-ups in a function
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string queryString =
@@ -148,7 +151,7 @@ namespace Test.Data
                 string queryString =
                     "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
                     "VALUES " +
-                    "('Testing Temp Tag', 0, 0, 0) " +
+                    "('" + TAG_NAME + "', 0, 0, 0) " +
                     "; " +
                     "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
                     "VALUES " +
@@ -160,7 +163,7 @@ namespace Test.Data
                     "DECLARE @Medium2Id INT; " +
                     "; " +
                     "SELECT @TagId = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag'" +
+                    "WHERE Name = '" + TAG_NAME + "'" +
                     "; " +
                     "SELECT @Medium1Id = Id FROM dbo.Media " +
                     "WHERE LocalPath = 'Test Medium Path'" +
@@ -193,7 +196,7 @@ namespace Test.Data
                 catch (Exception) { throw new DatabaseException(); }
             }
 
-            List<string> tagList = new List<string> { tagId };
+            List<string> tagList = new List<string> { TAG_NAME };
 
             // Act
             returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, -1, -1, false);
@@ -240,8 +243,8 @@ namespace Test.Data
                 string queryString =
                     "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
                     "VALUES " +
-                    "('Testing Temp Tag', 0, 0, 0), " +
-                    "('Testing Temp Tag 2', 0, 0, 0)" +
+                    "('" + TAG_NAME + "', 0, 0, 0), " +
+                    "('" + TAG_NAME + " 2', 0, 0, 0)" +
                     "; " +
                     "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
                     "VALUES (0, 0, 'Test Medium Path', 0)" +
@@ -251,10 +254,10 @@ namespace Test.Data
                     "DECLARE @TagId2 INT" +
                     "; " +
                     "SELECT @TagId1 = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag'" +
+                    "WHERE Name = '" + TAG_NAME + "'" +
                     "; " +
                     "SELECT @TagId2 = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag 2'" +
+                    "WHERE Name = '" + TAG_NAME + " 2'" +
                     "; " +
                     "SELECT @MediumId = Id FROM dbo.Media " +
                     "WHERE LocalPath = 'Test Medium Path'" +
@@ -284,7 +287,7 @@ namespace Test.Data
                 catch (Exception) { throw new DatabaseException(); }
             }
 
-            List<string> tagList = new List<string> { tagId1, tagId2 };
+            List<string> tagList = new List<string> { TAG_NAME, TAG_NAME + " 2" };
 
             // Act
             returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, -1, -1, false);
@@ -332,8 +335,8 @@ namespace Test.Data
                 string queryString =
                     "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
                     "VALUES " +
-                    "('Testing Temp Tag', 0, 0, 0), " +
-                    "('Testing Temp Tag 2', 0, 0, 0)" +
+                    "('" + TAG_NAME + "', 0, 0, 0), " +
+                    "('" + TAG_NAME + " 2', 0, 0, 0)" +
                     "; " +
                     "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
                     "VALUES " +
@@ -346,10 +349,10 @@ namespace Test.Data
                     "DECLARE @Tag2Id INT" +
                     "; " +
                     "SELECT @Tag1Id = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag'" +
+                    "WHERE Name = '" + TAG_NAME + "'" +
                     "; " +
                     "SELECT @Tag2Id = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag 2'" +
+                    "WHERE Name = '" + TAG_NAME + " 2'" +
                     "; " +
                     "SELECT @Medium1Id = Id FROM dbo.Media " +
                     "WHERE LocalPath = 'Test Medium Path'" +
@@ -383,7 +386,7 @@ namespace Test.Data
                 catch (Exception) { throw new DatabaseException(); }
             }
 
-            List<string> tagList = new List<string> { tag1Id, tag2Id };
+            List<string> tagList = new List<string> { TAG_NAME, TAG_NAME + " 2" };
 
             // Act
             returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, 0, 0, false);
@@ -440,8 +443,8 @@ namespace Test.Data
                 string queryString =
                     "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
                     "VALUES " +
-                    "('Testing Temp Tag', 0, 0, 0), " +
-                    "('Testing Temp Tag 2', 0, 0, 0)" +
+                    "('" + TAG_NAME + "', 0, 0, 0), " +
+                    "('" + TAG_NAME + " 2', 0, 0, 0)" +
                     "; " +
                     "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
                     "VALUES " +
@@ -454,10 +457,10 @@ namespace Test.Data
                     "DECLARE @Tag2Id INT" +
                     "; " +
                     "SELECT @Tag1Id = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag'" +
+                    "WHERE Name = '" + TAG_NAME + "'" +
                     "; " +
                     "SELECT @Tag2Id = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag 2'" +
+                    "WHERE Name = '" + TAG_NAME + " 2'" +
                     "; " +
                     "SELECT @Medium1Id = Id FROM dbo.Media " +
                     "WHERE LocalPath = 'Test Medium Path'" +
@@ -488,10 +491,10 @@ namespace Test.Data
                         medium2Id = reader.GetInt32(3);
                     }
                 }
-                catch (Exception) { throw new DatabaseException(); }
+                catch (Exception e) { throw new DatabaseException(e); }
             }
 
-            List<string> tagList = new List<string> { tag1Id.ToString(), tag2Id.ToString() };
+            List<string> tagList = new List<string> { TAG_NAME, TAG_NAME + " 2" };
 
             // Act
             returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, 0, 0, false);
@@ -517,7 +520,7 @@ namespace Test.Data
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     reader.Close();
                 }
-                catch (Exception) { throw new DatabaseException(); }
+                catch (Exception e) { throw new DatabaseException(e); }
             }
 
             // Assert
@@ -542,7 +545,7 @@ namespace Test.Data
                 string queryString =
                     "INSERT INTO dbo.Tags (Name, TypeId, OriginId, IsDeprecated) " +
                     "VALUES " +
-                    "('Testing Temp Tag', 0, 0, 0) " +
+                    "('" + TAG_NAME + "', 0, 0, 0) " +
                     "; " +
                     "INSERT INTO dbo.Media (TypeId, OriginId, LocalPath, IsArchived) " +
                     "VALUES " +
@@ -554,7 +557,7 @@ namespace Test.Data
                     "DECLARE @TagId INT; " +
                     "; " +
                     "SELECT @TagId = Id FROM dbo.Tags " +
-                    "WHERE Name = 'Testing Temp Tag'" +
+                    "WHERE Name = '" + TAG_NAME + "'" +
                     "; " +
                     "SELECT @Medium1Id = Id FROM dbo.Media " +
                     "WHERE LocalPath = 'Test Medium Path'" +
@@ -626,10 +629,10 @@ namespace Test.Data
         {
             // Arrange
             List<MediumDto> returnedMedia;
-            List<string> tagIds = new List<string> { "-1" };
+            List<string> tagList = new List<string> { "No Match" };
 
             // Act
-            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagIds, false, false, -2, -2, false);
+            returnedMedia = await _mediaData.GetMediaWithFiltersAndTagFilterAsync(tagList, false, false, -2, -2, false);
 
             // Assert
             Assert.That(returnedMedia.Count, Is.EqualTo(0));

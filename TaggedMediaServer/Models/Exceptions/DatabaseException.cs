@@ -8,5 +8,7 @@ namespace Models.Exceptions
 {
     public class DatabaseException : Exception
     {
+        public DatabaseException() { }
+        public DatabaseException(Exception innerException) : base(innerException.Message) { }
     }
 }

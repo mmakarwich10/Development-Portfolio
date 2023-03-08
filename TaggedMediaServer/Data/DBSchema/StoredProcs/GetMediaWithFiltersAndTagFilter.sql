@@ -15,7 +15,7 @@ BEGIN
 	SET NOCOUNT ON;
 
 	CREATE TABLE #TagListTable (
-		value varchar(6)
+		value varchar(50)
 	)
 
 	INSERT INTO #TagListTable
@@ -35,7 +35,7 @@ BEGIN
 		FROM dbo.Media m
 		LEFT JOIN dbo.MediumTag mt ON mt.MediumId = m.Id
 		LEFT JOIN dbo.Tags t ON t.Id = mt.TagId
-		WHERE (@TagList IS NULL OR mt.TagId IN (SELECT value FROM #TagListTable)) AND
+		WHERE (@TagList IS NULL OR t.Name IN (SELECT value FROM #TagListTable)) AND
 			(@IncludeNonDeprDissociated = 1 OR (@IncludeNonDeprDissociated = 0 AND mt.IsDissociated = 0)) AND
 			(@IncludeDeprecated = 1 OR (@IncludeDeprecated = 0 AND t.IsDeprecated = 0)) AND
 			(@OriginId = -1 OR m.OriginId = @OriginId) AND

@@ -103,7 +103,7 @@ namespace Data.Media
                 }
                 catch (Exception e)
                 {
-                    throw new DatabaseException();
+                    throw new DatabaseException(e);
                 }
             }
 

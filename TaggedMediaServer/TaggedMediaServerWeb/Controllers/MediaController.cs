@@ -21,6 +21,35 @@ namespace TaggedMediaServerWeb.Controllers
             _mediaLogic = mediaLogic;
         }
 
+        /// <summary>
+        ///     Searches for media based on various specifications.
+        /// </summary>
+        /// <param name="includeDeprecated">Set this flag if you're including deprecated tags in the search. Default: false.</param>
+        /// <param name="includeNonDeprDissociated">
+        ///     Set this flag if the media you're searching for might not have a (non-deprecated) tag associated to it anymore. Default: false.
+        /// </param>
+        /// <param name="originId">If you want to filter by medium origin, specify its ID here. Use -1 for any origin. Default: -1.</param>
+        /// <param name="typeId">If you want to filter by medium type, specify its ID here. Use -1 for any type. Default: -1.</param>
+        /// <param name="archived">Set this flag if you want to only return archived media in the results. Default: false.</param>
+        /// <returns>Array of filtered medium objects.</returns>
+        /// <exception cref="HttpResponseException">If there is a database issue, a 500 error will be returned.</exception>
+        /// <remarks>
+        ///     A 422 (Unprocessable Entity) error will be return if:
+        ///     <list type="bullet">
+        ///         <item>
+        ///             <description>Any given tag is null.</description>
+        ///         </item>
+        ///         <item>
+        ///             <description>Given Origin and/or Type ID is less than -1.</description>
+        ///         </item>
+        ///         <item>
+        ///             <description>Any given tag does not exist in the system.</description>
+        ///         </item>
+        ///         <item>
+        ///             <description>Given Origin and/or Type ID does not exist in the system.</description>
+        ///         </item>
+        ///     </list>
+        /// </remarks>
         [HttpGet]
         public async Task<IActionResult> GetMedia(
             [FromQuery(Name = "include-deprecated")] bool includeDeprecated = false, 
@@ -28,7 +57,7 @@ namespace TaggedMediaServerWeb.Controllers
             [FromQuery(Name = "origin")] int originId = -1,
             [FromQuery(Name = "type")] int typeId = -1,
             [FromQuery] bool archived = false)
-        {
+        { //TODO: Find out how (if possible) to add the tag param here.
             string?[] tagList = HttpContext.Request.Query["tag"].ToArray();
             List<string> cleanTagList = new List<string>();
 

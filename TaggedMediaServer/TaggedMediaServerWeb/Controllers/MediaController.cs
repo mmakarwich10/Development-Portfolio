@@ -69,6 +69,18 @@ namespace TaggedMediaServerWeb.Controllers
                 };
                 throw new HttpResponseException(response);
             }
+            catch (InvalidTagException)
+            {
+                return UnprocessableEntity("At least one given tag does not exist.");
+            }
+            catch (InvalidMediaTypeException)
+            {
+                return UnprocessableEntity("The given media type does not exist.");
+            }
+            catch (InvalidMediaOriginException)
+            {
+                return UnprocessableEntity("The given media origin does not exist.");
+            }
         }
     }
 }
